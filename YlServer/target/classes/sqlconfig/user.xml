@@ -1,0 +1,1262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- DATE_FORMAT -->
+<!-- 时间转字符串：date_format -->
+<!-- 字符串转时间：str_to_date -->
+<!-- DATE_FORMAT(tcb.check_begin_date, '%Y-%m-%d') -->
+<!-- birthday格式：%Y-%m-%d -->
+<!-- 其他时间格式：- %Y-%m-%d %H:%i:%s -->
+<mapper namespace="com.yl.mapper.UserMapper">
+	<select id="Getuserinfo" resultType="com.yl.beans.Userinfo"
+		parameterType="Map">
+		select
+		e.id,
+		e.userName,
+		e.nickName,
+		e.userCode,
+		e.headImg,
+		e.userPwd,
+		e.uuID,
+		e.status as userStatus,
+		date_format ( e.uuIDExpiry,
+		'%Y-%m-%d %H:%i:%s'
+		)
+		as uuIDExpiry,
+		e.leavel,
+		date_format(e.birthday,'%Y-%m-%d')
+		as birthday,
+		e.gender,
+		e.smsCode,
+		date_format(e.smsPwdExpiry,'%Y-%m-%d %H:%i:%s') as
+		smsPwdExpiry ,
+		date_format(e.loginTime,'%Y-%m-%d %H:%i:%s') as
+		loginTime,
+		e.loginCity,
+		date_format(e.createTime,'%Y-%m-%d %H:%i:%s') as
+		createTime,
+		ua.id as useramountId,
+		ua.balance,
+		ua.payPwd,
+		ua.minAmount,
+		ua.status,
+		ua.isOpen
+		from employee e
+		left join useramount ua
+		on ua.userId
+		= e.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userName != null and userName !=''">
+				e.userName = #{userName}
+			</if>
+			<if test="uuID != null and uuID !=''">
+				AND e.uuID = #{uuID}
+			</if>
+			<if test="id != null">
+				AND e.id = #{id}
+			</if>
+		</trim>
+	</select>
+
+	<update id="Updateuserinfo" parameterType="com.yl.beans.Userinfo">
+		update employee
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userName!=null">
+				userName = #{userName},
+			</if>
+			<if test="nickName!=null">
+				nickName = #{nickName},
+			</if>
+			<if test="headImg!=null">
+				headImg = #{headImg},
+			</if>
+			<if test="userPwd!=null">
+				userPwd = #{userPwd},
+			</if>
+			<if test="uuID!=null">
+				uuID = #{uuID},
+			</if>
+			<if test="uuIDExpiry!=null">
+				uuIDExpiry =str_to_date(#{uuIDExpiry,jdbcType =
+				DATE},'%Y-%m-%d %H:%i:%s'),</if>
+			<if test="leavel!=null">
+				leavel = #{leavel},
+			</if>
+			<if test="birthday!=null">
+				birthday = str_to_date(#{birthday,jdbcType =
+				DATE},'%Y-%m-%d'),</if>
+			<if test="gender!=null and gender > 0">
+				gender = #{gender},
+			</if>
+			<if test="smsCode!=null">
+				smsCode = #{smsCode},
+			</if>
+			<if test="smsPwdExpiry!=null">
+				smsPwdExpiry = str_to_date(#{smsPwdExpiry,jdbcType =
+				DATE},'%Y-%m-%d %H:%i:%s'),</if>
+			<if test="loginTime!=null">
+				loginTime = str_to_date(#{loginTime,jdbcType =
+				DATE},'%Y-%m-%d %H:%i:%s'),</if>
+			<if test="loginCity!=null">
+				loginCity = #{loginCity},
+			</if>
+			<if test="createTime!=null">
+				createTime = str_to_date(#{createTime,jdbcType
+				=DATE},'%Y-%m-%d %H:%i:%s')</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<insert id="Adduser" parameterType="com.yl.beans.Userinfo">
+		insert into employee
+		(userName,userCode,nickName,headImg,userPwd,leavel,birthday,gender,smsCode,
+		smsPwdExpiry,loginTime,loginCity,createTime,uuID,uuIDExpiry )
+		values(
+		#{userName,jdbcType = VARCHAR},
+		#{userCode,jdbcType = VARCHAR},
+		#{nickName,jdbcType =VARCHAR},
+		#{headImg,jdbcType = VARCHAR},
+		#{userPwd,jdbcType =VARCHAR},
+		#{leavel,jdbcType =INTEGER},
+		str_to_date(#{birthday,jdbcType=DATE},'%Y-%m-%d'),
+		#{gender,jdbcType =
+		INTEGER},
+		#{smsCode,jdbcType=
+		VARCHAR},
+		str_to_date(
+		#{smsPwdExpiry,jdbcType = DATE},
+		'%Y-%m-%d %H:%i:%s'),
+		str_to_date(#{loginTime,jdbcType = DATE},
+		'%Y-%m-%d %H:%i:%s'),
+		#{loginCity,jdbcType = INTEGER},
+		str_to_date(#{createTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s'),
+		#{uuID,jdbcType =VARCHAR},
+		str_to_date(#{uuIDExpiry,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<select id="getlogRecord" parameterType="Map" resultType="com.yl.beans.LogRecord">
+		SELECT
+		id,userName,smsCode,
+		Date_FORMAT(
+		smsPwdExpiry,
+		'%Y-%m-%d %H:%i:%s'
+		)
+		as smsPwdExpiry,
+		Date_FORMAT(addTime,'%Y-%m-%d %H:%i:%s')
+		as
+		addTime
+		FROM
+		logrecord where userName = #{userName}
+		AND operateType = #{operateType}
+		ORDER BY addTime
+		DESC
+		LIMIT 1
+	</select>
+
+	<insert id="AddlogRecord">
+		insert into logrecord
+		(userName,smsCode,operateType,smsPwdExpiry,addTime)
+		values(
+		#{userName,jdbcType =
+		VARCHAR},
+		#{smsCode,jdbcType = VARCHAR},
+		#{operateType,jdbcType =
+		INTEGER},
+		str_to_date(#{smsPwdExpiry,jdbcType = DATE},'%Y-%m-%d %H:%i:%s'),
+		str_to_date(#{addTime,jdbcType = DATE},'%Y-%m-%d %H:%i:%s') )
+	</insert>
+
+	<select id="getCity" parameterType="String" resultType="com.yl.beans.City">
+		select
+		id
+		as cityId,provinceId,cityName
+		from city where cityName like
+		"%"#{cityName}"%"
+	</select>
+
+
+	<insert id="saveEvaluate" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.yl.beans.Evaluate">
+		insert into
+		evaluate
+		(userId,fk,score,model,content,orderNo,goodsStandardId,goodsOrderExpandId,addTime)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{fk,jdbcType = INTEGER},
+		#{score,jdbcType = DECIMAL},
+		#{model,jdbcType = VARCHAR},
+		#{content,jdbcType =
+		VARCHAR},
+		#{orderNo,jdbcType =
+		VARCHAR},
+		#{goodsStandardId,jdbcType =
+		INTEGER},
+		#{goodsOrderExpandId,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s') )
+	</insert>
+
+	<insert id="saveEvaluateImg" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.yl.beans.EvaluateImg">
+		insert into
+		evaluateimg
+		(evaluateId,imgUrl)
+		values(
+		#{evaluateId,jdbcType = INTEGER},
+		#{imgUrl,jdbcType = VARCHAR})
+	</insert>
+
+	<insert id="saveCollect" parameterType="Map">
+		insert into
+		collect(userId,fk,model,addTime)
+		values(
+		#{userId,jdbcType = INTEGER},
+		#{fk,jdbcType = INTEGER},
+		#{model,jdbcType = VARCHAR},
+		str_to_date(#{addTime,jdbcType = DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+	<delete id="deleteCollectById" parameterType="Map">
+		delete from
+		collect
+		where userId = #{userId}
+		AND fk = #{fk}
+		AND model = #{model}
+	</delete>
+
+	<update id="updateScenic" parameterType="Map">
+		update scenic
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="collectCount !=null">
+				collectCount = #{collectCount},
+			</if>
+			<if test="evaluateCount !=null">
+				evaluateCount = #{evaluateCount},
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id !=null ">
+				id = #{id}
+			</if>
+			<if test="evaluateCount !=null ">
+				AND evaluateCount = #{evaluateCount}
+			</if>
+			<if test="evaluateCount !=null ">
+				AND evaluateCount = #{evaluateCount}
+			</if>
+		</trim>
+	</update>
+	<select id="getuserAmount" resultType="com.yl.beans.UserAmount"
+		parameterType="Map">
+		select
+		id,
+		userId,
+		balance,
+		payPwd,
+		minAmount,
+		status,
+		isOpen
+		from useramount
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+		</trim>
+	</select>
+	<insert id="saveBindCardLog" parameterType="Map">
+		insert into
+		bindcardlog(serialNo,userId,cardNo,cardAuthCode,status,addTime)
+		values(
+		#{serialNo,jdbcType = VARCHAR},
+		#{userId,jdbcType = INTEGER},
+		#{cardNo,jdbcType = VARCHAR},
+		#{cardAuthCode,jdbcType = VARCHAR},
+		#{status,jdbcType = INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+
+	<insert id="saveBindCard" parameterType="Map">
+		insert into
+		usercard(serialNo,userId,cardNo,cardAuthCode,status,addTime)
+		values(
+		#{serialNo,jdbcType = VARCHAR},
+		#{userId,jdbcType = INTEGER},
+		#{cardNo,jdbcType = VARCHAR},
+		#{cardAuthCode,jdbcType = VARCHAR},
+		#{status,jdbcType = INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<update id="updateUserCard" parameterType="Map">
+		update usercard
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="status !=null">
+				status = #{status}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+			<if test="id !=null">
+				AND id = #{id}
+			</if>
+			<if test="cardNo !=null">
+				AND cardNo = #{cardNo}
+			</if>
+			<if test="cardAuthCode !=null">
+				AND cardAuthCode =
+				#{cardAuthCode}
+			</if>
+		</trim>
+	</update>
+
+	<update id="updateScenicCard" parameterType="Map">
+		update sceniccard
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="status !=null">
+				status = #{status}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="cardNo !=null">
+				cardNo = #{cardNo}
+			</if>
+			<if test="cardAuthCode !=null">
+				AND checkCode = #{cardAuthCode}
+			</if>
+		</trim>
+	</update>
+
+	<delete id="deleteCard" parameterType="Map">
+		delete from
+		usercard
+		where
+		userId = #{userId}
+		AND cardNo = #{cardNo}
+		AND cardAuthCode =
+		#{cardAuthCode}
+	</delete>
+
+	<select id="getuserAddress" resultType="com.yl.beans.UserAddress"
+		parameterType="Map">
+		select
+		ua.id,
+		ua.userId,
+		e.nickName,
+		e.userName,
+		ua. provinceId,
+		p.provinceName,
+		ua.cityId,
+		c.cityName,
+		ua.districtId,
+		d.districtName,
+		ua.addressInfo,
+		ua.isDefault,
+		ua.zip,
+		ua.recipient,
+		ua. recipientMobile
+		from useraddress ua
+		left join province p on p.id =
+		ua.provinceId
+		left
+		join city c on c.id = ua.cityId
+		left join district d on d.id =
+		ua.districtId
+		left join employee e on e.id = ua.userId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				ua.userId = #{userId}
+			</if>
+			<if test="isDefault !=null">
+				AND ua.isDefault = #{isDefault}
+			</if>
+			<if test="addressId !=null">
+				AND ua.id = #{addressId}
+			</if>
+			
+<!-- 			<if test="isDel !=null"> -->
+				AND ua.isDel =0
+<!-- 			</if> -->
+		</trim>
+		order by locate(1,ua.isDefault) desc,ua.addTime
+		desc
+	</select>
+
+	<insert id="saveUserAddress" parameterType="com.yl.beans.UserAddress">
+		insert into
+		useraddress(userId,provinceId,cityId,districtId,addressInfo,isDefault,
+		zip,recipient,recipientMobile,addTime)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{provinceId,jdbcType = INTEGER},
+		#{cityId,jdbcType =
+		INTEGER},
+		#{districtId,jdbcType = INTEGER},
+		#{addressInfo,jdbcType =
+		VARCHAR},
+		#{isDefault,jdbcType = INTEGER},
+		#{zip,jdbcType = VARCHAR},
+		#{recipient,jdbcType = VARCHAR},
+		#{recipientMobile,jdbcType = VARCHAR},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+
+	<update id="updateuserAddress" parameterType="com.yl.beans.UserAddress">
+		update useraddress
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="provinceId !=null">
+				provinceId = #{provinceId},
+			</if>
+			<if test="cityId !=null">
+				cityId = #{cityId},
+			</if>
+			<if test="districtId !=null">
+				districtId = #{districtId},
+			</if>
+			<if test="addressInfo !=null">
+				addressInfo = #{addressInfo},
+			</if>
+			<if test="isDefault !=null">
+				isDefault = #{isDefault},
+			</if>
+			<if test="recipient !=null">
+				recipient = #{recipient},
+			</if>
+			<if test="zip !=null ">
+				zip = #{zip},
+			</if>
+			<if test="recipientMobile !=null">
+				recipientMobile = #{recipientMobile},
+			</if>
+			<if test=" isDel !=null">
+				isDel = #{isDel},
+			</if>
+		</trim>
+		where
+		id = #{id}
+		AND userId = #{userId}
+	</update>
+
+	<delete id="deleteuserAddress" parameterType="Map">
+		delete from
+		useraddress
+		where
+		id = #{id}
+		AND userId = #{userId}
+	</delete>
+
+
+	<select id="getAddress" resultType="String">
+		select
+		concat(concat('{"provinceList":[',itemTog),']}')
+		as aaaa from
+		(
+		select
+		group_concat(items) as itemTog from
+		(
+		select
+		concat('{"provinceId":',provinceId,',"state":"',provinceName,'","cities":[',cityOutPut,']}')
+		as items from
+		(
+		select group_concat(cityareas) as
+		cityOutPut,provinceName,provinceId from
+		(
+		select
+		concat('{"cityId":',cityId,',"city":"',cityName,'","areas":',aa,'}')
+		as cityareas,cityId,provinceId,cityName,provinceName from
+		(
+		select
+		aa,cityId,cityName,provinceId from
+		(
+		select
+		concat(concat('[',allArea),']') as aa , city.id as
+		cityid,city.cityName as cityName,city.provinceId as provinceId from
+		(
+		select cityId,group_concat(areaName) as allArea from
+		(
+		select cityId ,
+		concat('{"districtId":',id,',"area":"',districtName,'"}') as
+		areaName
+		from district
+		) as A group by cityId
+		) as AAA,city where AAA.cityId =
+		city.id
+		) as BBB
+		) as BKBK
+		, province where BKBK.provinceId = province.id
+		) as citysOut GROUP BY provinceId
+		) as outPut
+		) as tab1
+		) as tab2
+	</select>
+
+	<insert id="saveUserAmount" parameterType="Map">
+		insert into
+		useramount(
+		userId,
+		balance,
+		payPwd,
+		minAmount,
+		status,
+		isOpen)
+		values(
+		#{userId,jdbcType = INTEGER},
+		#{balance,jdbcType = DECIMAL},
+		#{payPwd,jdbcType = INTEGER},
+		#{minAmount,jdbcType =DECIMAL},
+		#{status,jdbcType = INTEGER},
+		#{isOpen,jdbcType = INTEGER}
+		)
+	</insert>
+	<update id="updateUserAmount" parameterType="Map">
+		update useramount
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="userId !=null">
+				userId = #{userId},
+			</if>
+			<if test="balance != null ">
+				balance = #{balance},
+			</if>
+			<if test="payPwd !=null">
+				payPwd = #{payPwd},
+			</if>
+			<if test="minAmount !=null">
+				minAmount = #{minAmount},
+			</if>
+			<!-- <if test="status !=null"> -->
+			<!-- status = #{status}, -->
+			<!-- </if> -->
+			<if test="isOpen !=null">
+				isOpen = #{isOpen}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+			<if test="id !=null">
+				AND id = #{id}
+			</if>
+			<if test="status !=null">
+				AND status = #{status}
+			</if>
+		</trim>
+	</update>
+
+	<insert id="saveMessage" parameterType="Map">
+		insert into
+		systemmessage(
+		messageType,
+		messageContent,
+		isDel,
+		addTime,
+		isRead,
+		device_token,
+		mbSystemType,
+		pmId,
+		operateId,
+		operateType
+		)
+		values(
+		#{messageType,jdbcType =
+		INTEGER},
+		#{messageContent,jdbcType =
+		VARCHAR},
+		#{isDel,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s'),
+		#{isRead,jdbcType =
+		INTEGER},
+		#{device_token,jdbcType =
+		VARCHAR},
+		#{mbSystemType,jdbcType =
+		INTEGER},
+		#{pmId,jdbcType =
+		INTEGER},
+		#{operateId,jdbcType =
+		INTEGER},
+		#{operateType,jdbcType =
+		INTEGER}
+		)
+	</insert>
+
+	<update id="updateMessage" parameterType="Map">
+		update systemmessage
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="isDel !=null">
+				isDel = #{isDel},
+			</if>
+			<if test="isRead !=null">
+				isRead = #{isRead}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="operateId !=null">
+				operateId = #{operateId}
+			</if>
+			<if test="operateType !=null">
+				AND operateType = #{operateType}
+			</if>
+			<if test="id !=null">
+				AND id = #{id}
+			</if>
+			<if test="messageType !=null">
+				AND messageType = #{messageType}
+			</if>
+			<if test="device_token !=null">
+				AND device_token = #{device_token}
+			</if>
+		</trim>
+	</update>
+
+	<select id="getMessage" resultType="com.yl.beans.Message"
+		parameterType="Map">
+		select
+		id,
+		messageType,
+		messageContent,
+		date_format(
+		addTime, '%Y-%m-%d %H:%i:%s'
+		) as
+		addTime,
+		isRead,
+		isDel
+		from
+		systemmessage
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="messageType != null ">
+				messageType = #{messageType}
+			</if>
+			<if test="operateId != null ">
+				AND operateId = #{operateId}
+			</if>
+			<if test="operateType != null ">
+				AND operateType = #{operateType}
+			</if>
+			<if test="device_token != null ">
+				AND device_token = #{device_token}
+			</if>
+			<if test="mbSystemType != null ">
+				AND mbSystemType = #{mbSystemType}
+			</if>
+			<if test="id != null ">
+				AND id = #{id}
+			</if>
+			AND isDel = 0
+			order by addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+
+	<select id="getMessageNum" resultType="String" parameterType="Map">
+		select
+		ifnull(CAST(COUNT(*) AS CHAR),0) as num
+		from
+		systemmessage
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="messageType != null ">
+				messageType = #{messageType}
+			</if>
+			<if test="operateId != null ">
+				AND operateId = #{operateId}
+			</if>
+			<if test="operateType != null ">
+				AND operateType = #{operateType}
+			</if>
+			<if test="device_token != null ">
+				AND device_token = #{device_token}
+			</if>
+			<if test="mbSystemType != null ">
+				AND mbSystemType = #{mbSystemType}
+			</if>
+			<if test="isRead != null ">
+				AND isRead = #{isRead}
+			</if>
+			AND isDel = 0
+		</trim>
+	</select>
+
+	<select id="getfeedbackList" resultType="com.yl.beans.FeedbackType"
+		parameterType="Map">
+		select
+		code,
+		codeName
+		from
+		codemaste
+		where model =
+		'feedback'
+	</select>
+
+	<insert id="savefeedback" parameterType="Map">
+		insert into
+		feedback(
+		userId,
+		codeType,
+		feedbackContent,
+		addTime
+		)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{codeType,jdbcType = INTEGER},
+		#{feedbackContent,jdbcType =
+		VARCHAR},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<select id="getsearchlog" resultType="Map" parameterType="Map">
+		select * from(
+		select
+		keyword
+		from
+		searchlog
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userType != null ">
+				userType = #{userType}
+			</if>
+			<if test="userId != null ">
+				AND userId = #{userId}
+			</if>
+			<if test="id != null ">
+				AND id = #{id}
+			</if>
+			And isDel = 0
+			order by addTime desc
+		</trim>
+		) s group by s.keyword limit 5
+	</select>
+
+
+	<insert id="savesearchlog" parameterType="Map">
+		insert into
+		searchlog(
+		userId,
+		keyword,
+		userType,
+		isDel,
+		addTime
+		)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{keyword,jdbcType =
+		VARCHAR},
+		#{userType,jdbcType = VARCHAR},
+		#{isDel,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<update id="updatesearchlog" parameterType="Map">
+		update searchlog
+		<trim prefix="SET" suffixOverrides=",">
+			isDel = 1
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+		</trim>
+	</update>
+
+	<insert id="savescore" parameterType="Map">
+		insert into
+		score(
+		userId,
+		sourceId,
+		score,
+		addTime,
+		orderNo,
+		orderType,
+		status
+		)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{sourceId,jdbcType =
+		INTEGER},
+		#{score,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s'),
+				#{orderNo,jdbcType =
+		VARCHAR},
+				#{orderType,jdbcType =
+		INTEGER},
+				#{status,jdbcType =
+		INTEGER}
+		)
+	</insert>
+	<select id="getscore" resultType="Map" parameterType="Map">
+		select
+		userId,
+		CASE WHEN sourceId = 1 THEN CONCAT('注册')
+		WHEN sourceId = 2
+		THEN
+		CONCAT('消费')
+		WHEN
+		sourceId = 4 THEN CONCAT('抵扣')
+		WHEN
+		sourceId = 3
+		THEN CONCAT('发布游记')
+		WHEN
+		sourceId =5 THEN CONCAT('返还')
+		WHEN 
+		sourceId =6 THEN CONCAT('扣还')
+		END AS typeString,
+		sourceId,
+		CASE WHEN
+		score&gt;=0 THEN CONCAT('+',score)
+		WHEN score &lt;0
+		THEN score
+		END AS
+		score,
+		date_format(addTime,'%Y-%m-%d %H:%i:%s') as
+		addTime
+		from
+		score
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				userId = #{userId}
+			</if>
+			<if test="id != null ">
+				AND id = #{id}
+			</if>
+			order by addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+	
+	
+<update id="updateStore" parameterType="Map">
+		update score
+		<trim prefix="SET" suffixOverrides=",">
+		<if test="status !=null">
+		status = #{status}
+		</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+			<if test="orderNo!=null">
+			AND orderNo = #{orderNo}
+			</if>
+		<if test="orderType !=null">
+			AND orderType = #{orderType}
+			</if>
+		</trim>
+	</update>
+	
+	
+	<select id="gettotalScore" resultType="String" parameterType="Map">
+		select
+		ifnull(CAST(sum(s.score) AS CHAR),0) as score
+		from
+		score s
+		<if test="type != null and type ==1">
+		left join `order` o on s.orderNo= o.orderNo and
+		s.orderType = o.orderType and o.status in (8,9,10)
+		</if>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				s.userId = #{userId}
+			</if>
+			<if test="id != null ">
+				AND s.id = #{id}
+			</if>
+			<if test="type != null ">
+				<choose>
+					<when test="type == 1">
+						AND s.score &gt; 0 AND s.status =1
+					</when>
+				</choose>
+			</if>
+			order by s.addTime desc
+		</trim>
+	</select>
+
+
+	<insert id="saveexpenselog" parameterType="Map">
+		insert into
+		expenselog(
+		payNo,
+		serialNo,
+		userId,
+		typePay,
+		typeSource,
+		amount,
+		addTime
+		)
+		values(
+		#{payNo,jdbcType =
+		VARCHAR},
+		#{serialNo,jdbcType =
+		VARCHAR},
+		#{userId,jdbcType =
+		INTEGER},
+		#{typePay,jdbcType =
+		INTEGER},
+		#{typeSource,jdbcType =
+		INTEGER},
+		#{amount,jdbcType =DECIMAL
+		},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+
+	<select id="getexpenselog" resultType="com.yl.beans.ExpenseUserLog"
+		parameterType="Map">
+		select
+		eul.expenseUserNo,
+		eul.serialNo,
+		eul.userId,
+		CASE WHEN
+		eul.paymentAmount &gt;=0 THEN CONCAT('+',eul.paymentAmount)
+		WHEN
+		eul.paymentAmount &lt;0
+		THEN eul.paymentAmount
+		END AS
+		paymentAmount,
+		eul.useType,
+		eul.paymentType,
+		eul.expenseType,
+		eul.sourceType,
+		eul.orderNo,
+		eul.remark,
+		IFNULL(pa.status,0) as status ,
+		date_format(
+		eul.addTime,
+		'%Y-%m-%d %H:%i:%s') as
+		addTime
+		from
+		expenseuserlog eul
+		left
+		join
+		presentapplication
+		pa on pa.expenseNo = eul.expenseUserNo
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				userId = #{userId}
+			</if>
+			order by addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<insert id="saveUserPayAccount" parameterType="Map">
+		insert into
+		userpayaccount(
+		operateId,
+		operateType,
+		accountName,
+		typeId,
+		status,
+		isDel
+		)
+		values(
+		#{operateId,jdbcType =
+		INTEGER},
+		#{operateType,jdbcType =
+		INTEGER},
+		#{accountName,jdbcType =
+		VARCHAR},
+		#{typeId,jdbcType =
+		INTEGER},
+		#{status,jdbcType =
+		INTEGER},
+		#{isDel,jdbcType =INTEGER
+		}
+		)
+	</insert>
+
+	<update id="updateUserPayAccount" parameterType="Map">
+		update userpayaccount
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="isDel!=null">
+				isDel = #{isDel},
+			</if>
+			<if test="status!=null">
+				status = #{status}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id!=null">
+				id = #{id}
+			</if>
+			<if test="operateId !=null ">
+				AND operateId = #{operateId}
+			</if>
+			<if test="operateType !=null ">
+				AND operateType = #{operateType}
+			</if>
+		</trim>
+	</update>
+
+	<select id="getUserPayAccount" resultType="com.yl.beans.UserPayAccount"
+		parameterType="Map">
+		select id as accountId,accountName,status,typeId,operateId,operateType
+		from userpayaccount
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="operateId !=null">
+				operateId = #{operateId}
+			</if>
+			<if test="operateType !=null">
+				AND operateType = #{operateType}
+			</if>
+			<if test="accountId !=null">
+				AND id = #{accountId}
+			</if>
+			<if test="accountName !=null">
+				AND accountName = #{accountName}
+			</if>
+			<if test="typeId !=null">
+				AND typeId = #{typeId}
+			</if>
+			<if test="isDel !=null">
+				AND isDel = #{isDel}
+			</if>
+		</trim>
+	</select>
+
+	<insert id="savePresentApplication" parameterType="Map">
+		insert into
+		presentapplication(
+		expenseNo,
+		accountId,
+		amount,
+		status,
+		operateType,
+		operateId,
+		addTime,
+		modifyTime
+		)
+		values(
+		#{expenseNo,jdbcType =
+		VARCHAR},
+		#{accountId,jdbcType =
+		INTEGER},
+		#{amount,jdbcType =
+		DECIMAL},
+		#{status,jdbcType =
+		INTEGER},
+		#{operateType,jdbcType =
+		INTEGER},
+		#{operateId,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s'),
+		str_to_date(#{modifyTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<select id="getPresentApplication" parameterType="map"
+		resultType="com.yl.beans.PresentApplication">
+		select
+		expenseNo,
+		accountId,
+		amount,
+		status,
+		operateType,
+		operateId
+		from
+		presentapplication
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="operateId !=null">
+				operateId = #{operateId}
+			</if>
+			<if test="operateType !=null">
+				AND operateType = #{operateType}
+			</if>
+			<if test="accountId !=null">
+				AND accountId = #{accountId}
+			</if>
+			<if test="accountName !=null">
+				AND accountName = #{accountName}
+			</if>
+			<if test="status !=null">
+				AND status = #{status}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getPushMessageDevice" parameterType="Map"
+		resultType="com.yl.beans.PushMessageDevice">
+		select
+		placeX,
+		placeY,
+		device_token,
+		mbSystemType,
+		operateId,
+		operateType
+		from
+		pushmessagedevice
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="device_token!=null">
+				device_token = #{device_token}
+			</if>
+			<if test="operateId!=null and operateId>0">
+				AND operateId = #{operateId}
+			</if>
+			<if test="mbSystemType !=null and mbSystemType >0">
+				AND mbSystemType = #{mbSystemType}
+			</if>
+			<if test="operateType !=null and operateType >0">
+				AND operateType = #{operateType}
+			</if>
+		</trim>
+	</select>
+
+	<update id="updatePushMessageDevice" parameterType="Map">
+		update pushmessagedevice
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="placeX != null">
+				placeX = #{placeX},
+			</if>
+			<if test="placeY != null">
+				placeY = #{placeY},
+			</if>
+			<if test="operateId1 != null">
+				operateId = #{operateId1},
+			</if>
+			<if test="operateType1 != null">
+				operateType = #{operateType1},
+			</if>
+			<if test="modifyTime !=null">
+				modifyTime = str_to_date(#{modifyTime,jdbcType = DATE},
+				'%Y-%m-%d %H:%i:%s'),
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="device_token != null">
+				device_token = #{device_token}
+			</if>
+			<if test="mbSystemType != null">
+				AND mbSystemType = #{mbSystemType}
+			</if>
+			<if test="operateId != null">
+				AND operateId = #{operateId}
+			</if>
+			<if test="operateType != null">
+				AND operateType = #{operateType}
+			</if>
+		</trim>
+	</update>
+
+	<insert id="savePushMessageDevice" parameterType="Map">
+		insert into
+		pushmessagedevice
+		(placeX,
+		placeY,
+		device_token,
+		mbSystemType,
+		operateId,
+		operateType,
+		addTime,
+		modifyTime )
+		values(
+		#{placeX,jdbcType =
+		DECIMAL},
+		#{placeY,jdbcType =
+		DECIMAL},
+		#{device_token,jdbcType = VARCHAR},
+		#{mbSystemType,jdbcType =INTEGER},
+		#{operateId,jdbcType =INTEGER},
+		#{operateType,jdbcType =INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},
+		'%Y-%m-%d %H:%i:%s'),
+		str_to_date(#{modifyTime,jdbcType = DATE},
+		'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<insert id="savePushMessageLog" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.yl.beans.PushMessageLog">
+		insert into pushmessagelog(
+		messageType,
+		messageContent,
+		operateType,
+		operateId,
+		addTime,
+		pushType
+		)
+		values(
+		#{messageType,jdbcType =INTEGER},
+		#{messageContent,jdbcType =
+		VARCHAR},
+		#{operateType,jdbcType =INTEGER},
+		#{operateId,jdbcType
+		=INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},
+		'%Y-%m-%d %H:%i:%s'),
+		#{pushType,jdbcType =INTEGER}
+		)
+	</insert>
+
+	<select id="gettotalAmount" resultType="String" parameterType="Map">
+		select
+		ifnull(CAST(sum(paymentAmount) AS CHAR),0) as totalAmount
+		from
+		expenseuserlog
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				userId = #{userId}
+			</if>
+			<if test="type != null ">
+				<choose>
+					<when test="type == 1">
+						AND paymentType in (1,2) AND expenseType !=3
+					</when>
+				</choose>
+			</if>
+		</trim>
+	</select>
+</mapper>

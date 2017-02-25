@@ -1,0 +1,555 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Agile Lite</title>
+    <link rel="stylesheet" href="../assets/agile/css/agile.layout.css">
+    <link rel="stylesheet" href="../assets/third/seedsui/plugin/seedsui/seedsui.min.css">
+    <script src="../assets/third/jquery/jquery-2.1.3.js"></script>
+    <script>
+        window.addEventListener('orientationchange', function (event) {
+            if (window.orientation == 180 || window.orientation == 0) {
+                //A.alert('提示', '竖屏');
+                //return false;
+                history.go(0)
+            }
+            if (window.orientation == 90 || window.orientation == -90) {
+                //A.alert('提示', '横屏');
+                //return false;
+                history.go(0)
+            }
+        });
+    </script>
+    <style>
+        .margin-top10 {
+            margin-top:10px;
+        }
+        .scroller-border-bottom{
+            border-bottom:1px solid #ccc;
+        }
+        .slide-img {
+            text-align:center;
+        }
+        .slide-img{
+         width:320px;
+        }
+         .font-size17 {
+            font-size:17px;
+            
+        }
+        .font-size15 {
+            font-size:15px;
+        }
+        .font-size14 {
+            font-size:14px;
+        }
+         .font-size13{
+            font-size:13px;
+        }
+        .font-size12{
+            font-size:12px;
+        }
+        .tabbar-bottom {
+            background-color:#5fcae8;
+            height:50px !important;
+            line-height:50px !important;
+            font-size:15px;
+            color:#fff;
+        }
+        .middle-line {
+            border-right:1px solid #fff;
+        }
+        .noborder {
+            border:0px !important;
+        }
+        .padding-goodinfo{
+            padding:5px 10px;
+        }
+        .mark-price{
+            color:#787878;
+            font-size:14px;
+        }
+        .price{
+            color:red;
+            font-size:16px;
+            margin-left:10px;
+        }
+        .good-norms{
+            padding:4px 12px;
+            border-radius:6px;
+            margin-left:10px;
+            border:1px solid #666666;
+            color:#666666;
+            margin-bottom:8px;
+        }
+        .good-norms-selected{
+            border:1px solid #ff3333;
+            color:#ff3333;
+        }
+        .part-note-left{
+            width:50px;
+            float:left;
+        }
+       .part-note-right{
+           margin-left:52px;
+        }
+       .font-color1{
+           color:#787878;
+       }
+       .img-full-width{
+           width:100%;
+       }
+       .page-bottom{
+           margin-bottom:50px;
+       }
+       .prompt{
+           background-color:#F0F0F0;
+       }
+       .prompt-next{
+           background-color:#F6F6F6;
+       }
+       .prompt li{ 
+           float:left;
+           border:0px;
+           display:block;
+           margin-left:10px;
+           background-color:#F0F0F0;
+           margin-bottom:5px;
+       }
+       .prompt li img{
+           margin-right:5px;
+           width:15px;
+       }
+       .comment{
+           list-style:none;
+       }
+       .comment li{
+           padding:10px 10px;
+           border-bottom:1px solid #ccc;
+           color:#666666;
+       }
+       .comment-list{
+           list-style:none;
+       }
+       .spanstar{
+           float:left;
+           margin-left:10px;
+           position:fixed
+       }
+       .graystar{
+           z-index:2;
+           position:relative;
+           left:0px;
+       }
+       .yellowstar{
+          position:absolute;z-index:99; top:0px; overflow:hidden; float:left
+       }
+       .goodinfo .active{
+           color:#ff3333 !important;
+           border-bottom:1px solid #ccc !important;
+       }
+       .tabattr{
+           border-top:1px solid #ccc;
+           border-left:1px solid #ccc;
+           
+           width:95%;
+           margin:0 auto;
+           margin-top:30px;
+       }
+       .tabattr td{
+           border-bottom:1px solid #ccc;
+           border-right:1px solid #ccc;
+           padding:0px;
+           height:30px;
+       }
+       .comment-title .active{
+           line-height:100%;
+           border-bottom:1px solid #ccc !important;
+       }
+       .comment-title .tab-label{
+           height:30px;
+           line-height:120%;
+       }
+       .comment-imglist{
+           width:100%;
+           overflow-x:auto;
+       }
+       .comment-imglist img{
+           width:150px;
+           margin-left:10px;
+           float:left;
+           margin-top:5px;
+       }
+    </style>
+</head>
+<body>
+    <div id="section_container">
+        <section id="slider_section" data-role="section" class="active">
+            <header>
+                <div id="tabbarOuter" data-scroll="horizontal">
+                    <div class="scroller" >
+                        <ul class="slidebar">
+                            <li class="tab active" data-role="tab" href="#page1" data-toggle="page">
+                                <label class="tab-label font-size17">商品</label>
+                            </li>
+                            <li class="tab" data-role="tab" href="#page2" data-toggle="page">
+                                <label class="tab-label font-size17">详情</label>
+                            </li>
+                            <li class="tab" data-role="tab" href="#page3" data-toggle="page">
+                                <label class="tab-label font-size17">评价</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+            <article data-role="article" id="slider_article" class="active page-bottom" >
+                <div id="sliderPage" data-role="slider" class="full">
+                    <div class="scroller">
+                        <div id="page1" class="slide" data-role="page" data-scroll="verticle">
+                            <div class="scroller">
+                                <div id="slide" data-role="slider" class="full scroller-border-bottom" style="overflow: hidden; height:180px;">
+                                    <div class="scroller">
+                                        <div class="slide slide-img">
+                                            <img class="slide-img" src="../Image/1@2x.png" />
+                                        </div>
+                                        <div class="slide slide-img">
+                                            <img class="slide-img" src="../Image/3@2x.png" />
+                                        </div>
+                                        <div class="slide slide-img">
+                                            <img class="slide-img" src="../Image/11@2x.png" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                    <ul class="list margin-top10">
+                                        <li class="noborder">
+                                            <div class="padding-goodinfo font-size15">
+                                                商品名称：<label>横店酥饼</label>
+                                            </div>
+                                        </li>
+                                        <li class="noborder">
+                                            <div class="padding-goodinfo font-size14">
+                                                商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述商品描述
+                                            </div>
+                                        </li>
+                                        <li class="noborder">
+                                            <div class="justify-content font-size14">
+                                                <label class="part-note-left">价格：</label><p class="part-note-right"><s class="mark-price"><label>￥39.00</label></s><label class="price">￥30.50</label> </p>
+                                            </div>
+                                        </li>
+                                        <li class="noborder"style="padding:0px 10px;">
+                                            <hr style="width:100%;" />
+                                        </li>
+                                        <li class="noborder">
+                                            <div class="justify-content font-size14">
+                                                <label class="part-note-left">选择：</label>
+                                                <p class="part-note-right">
+                                                    <a class="good-norms">规格规格1</a><a class="good-norms good-norms-selected">规格1</a> <a class="good-norms">规格2</a>
+                                                    <a class="good-norms">规格规格7</a><a class="good-norms">规格3</a> <a class="good-norms">规格4</a>
+                                                    <a class="good-norms">规格规格8</a><a class="good-norms">规格5</a> <a class="good-norms">规格6</a>
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li class="noborder" style="padding:0px 10px;">
+                                            <hr style="width:100%;" />
+                                        </li>
+                                        <li>
+                                            <div class="justify-content font-size14">
+                                                <label class="part-note-left">运费：</label>
+                                                <p class="part-note-right font-color1">3件内10元，没增加1件，加收5元，超过10件免运费</p>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="justify-content font-size12 prompt">
+                                               <ul>
+                                                   <li><img src="../Image/icon/prompt.png" />库存：9999</li>
+                                                   <li><img src="../Image/icon/prompt.png" />支持快递</li>
+                                                   <li><img src="../Image/icon/prompt.png" />支持自取</li>
+                                                   <li><img src="../Image/icon/prompt.png" />七天内可退货</li>
+                                               </ul>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="justify-content font-size14 prompt-next">
+                                               
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div>
+                                        <ul class="comment">
+                                            <li>
+                                                评论
+                                            </li>
+                                            <li class="noborder">
+                                                <ul class="comment-list">
+                                                    <li class="noborder" >
+                                                        <span style="float:left">某某某</span>
+                                                        <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:40px" class="yellowstar"><img  src="../Image/icon/star-yellow.png" /></div></span>
+                                                        <span style="float:right"  class="font-size13">2016-12-13</span>
+                                                    </li>
+                                                    <li style="clear:both;" class="noborder font-size13">
+                                                        评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                    </li>
+                                                    <li class="comment-imglist">
+                                                            <img src="../Image/1@2x.png" />
+                                                            <img src="../Image/1@2x.png" />
+                                                            <img src="../Image/1@2x.png" />
+                                                            <img src="../Image/1@2x.png" />
+                                                    </li>
+                                                </ul>
+                                                <ul class="comment-list">
+                                                    <li class="noborder">
+                                                        <span style="float:left">某某某</span>
+                                                        <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:70px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                        <span style="float:right" class="font-size13">2016-12-13</span>
+                                                    </li>
+                                                    <li style="clear:both;"  class="noborder font-size13">
+                                                        评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                    </li>
+                                                    <li></li>
+                                                </ul>
+                                                <ul class="comment-list">
+                                                    <li class="noborder">
+                                                        <span style="float:left">某某某</span>
+                                                        <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:100px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                        <span style="float:right" class="font-size13">2016-12-13</span>
+                                                    </li>
+                                                    <li style="clear:both;"  class="noborder font-size13">
+                                                        评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                    </li>
+                                                    <li></li>
+                                                </ul>
+                                                <ul class="comment-list">
+                                                    <li class="noborder">
+                                                        <span style="float:left">某某某</span>
+                                                        <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:60px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                        <span style="float:right" class="font-size13">2016-12-13</span>
+                                                    </li>
+                                                    <li style="clear:both;" class="noborder font-size13">
+                                                        评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                    </li>
+                                                    <li></li>
+                                                </ul>
+                                            </li>
+                                            <li class="noborder">
+                                                <div class="justify-content font-size14" style="text-align:center; ">
+                                                    <a data-role="tab" href="#page3" data-toggle="page"  style="display:block;border:1px solid #ccc;border-radius:5px; padding:10px 15px;">查看全部评论</a>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+                            </div>
+                        </div>
+                        <div id="page2" class="slide" data-role="page" data-scroll="verticle">
+                            <div id="tabbarOuter" data-scroll="horizontal">
+                                <div class="scroller">
+                                    <ul class="slidebar goodinfo">
+                                        <li class="tab active" data-role="tab" href="#page4" data-toggle="page">
+                                            <label class="tab-label font-size14">商品详情</label>
+                                        </li>
+                                        <li class="tab" data-role="tab" href="#page5" data-toggle="page">
+                                            <label class="tab-label font-size14">属性参数</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                              </div>
+                                <article data-role="article" id="slider_article" class="active">
+                                    <div id="sliderGoodInfo" data-role="slider" class="full">
+                                        <div class="scroller">
+                                            <div id="page4" class="slide" data-role="page" data-scroll="verticle">
+                                                <div class="scroller">
+                                                    <img class="img-full-width" src="../Image/1@2x.png" />
+                                                    <img class="img-full-width" src="../Image/2@2x.png" />
+                                                    <img class="img-full-width" src="../Image/3@2x.png" />
+                                                    <img class="img-full-width" src="../Image/4@2x.png" />
+                                                    <img class="img-full-width" src="../Image/5@2x.png" />
+                                                    <img class="img-full-width" src="../Image/6@2x.png" />
+                                                    <img class="img-full-width" src="../Image/7@2x.png" />
+                                                    <img class="img-full-width" src="../Image/8@2x.png" />
+                                                </div>
+                                                <div class="scroller">
+                                                </div>
+                                            </div>
+                                            <div id="page5" class="slide" data-role="page" data-scroll="verticle">
+                                                <div class="scroller">
+                                                    <table cellpadding="0" cellspacing="0" class="tabattr">
+                                                        <tr>
+                                                            <td>品牌</td>
+                                                            <td>牌子</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>净重</td>
+                                                            <td>0.5kg</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>材质</td>
+                                                            <td>金属</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                            </div>
+                                    <div id="page3" class="slide" data-role="page" data-scroll="pullup">
+                                        <div class="scroller">
+                                            <ul class="slidebar comment-title">
+                                                <li class="tab active commentli" data-role="tab" ischecked="0" onclick="checkcomment(this,'all')" >
+                                                    <span class="tab-label font-size12">全部评价<br />100</span>
+                                                </li>
+                                                <li class="tab commentli" data-role="tab" ischecked="0" onclick="checkcomment(this,'good')" >
+                                                    <span class="tab-label font-size12">好评<br />100</span>
+                                                </li>
+                                                <li class="tab commentli" data-role="tab" ischecked="0" onclick="checkcomment(this, 'middle')">
+                                                    <span class="tab-label font-size12">中评<br />100</span>
+                                                </li>
+                                                <li class="tab commentli" data-role="tab" ischecked="0" onclick="checkcomment(this,'bad')">
+                                                    <span class="tab-label font-size12">差评<br />100</span>
+                                                </li>
+                                            </ul>
+                                            <ul class="comment">
+                                                <li>
+                                                </li>
+                                                <li class="noborder" id="commentlist">
+                                                    <ul class="comment-list">
+                                                        <li class="noborder">
+                                                            <span style="float:left">某某某</span>
+                                                            <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:40px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                            <span style="float:right" class="font-size13">2016-12-13</span>
+                                                        </li>
+                                                        <li style="clear:both;" class="noborder font-size13">
+                                                            评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                        </li>
+                                                        <li></li>
+                                                    </ul>
+                                                    <ul class="comment-list">
+                                                        <li class="noborder">
+                                                            <span style="float:left">某某某</span>
+                                                            <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:70px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                            <span style="float:right" class="font-size13">2016-12-13</span>
+                                                        </li>
+                                                        <li style="clear:both;" class="noborder font-size13">
+                                                            评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                        </li>
+                                                        <li></li>
+                                                    </ul>
+                                                    <ul class="comment-list">
+                                                        <li class="noborder">
+                                                            <span style="float:left">某某某</span>
+                                                            <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:100px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                            <span style="float:right" class="font-size13">2016-12-13</span>
+                                                        </li>
+                                                        <li style="clear:both;" class="noborder font-size13">
+                                                            评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                        </li>
+                                                        <li></li>
+                                                    </ul>
+                                                    <ul class="comment-list">
+                                                        <li class="noborder">
+                                                            <span style="float:left">某某某</span>
+                                                            <span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:60px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span>
+                                                            <span style="float:right" class="font-size13">2016-12-13</span>
+                                                        </li>
+                                                        <li style="clear:both;" class="noborder font-size13">
+                                                            评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容评论内容
+                                                        </li>
+                                                        <li></li>
+                                                    </ul>
+                                                </li>
+                                                
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                        </div>
+            </article>
+            <footer>
+                <ul class="menubar">
+                    <li class="tab" data-role="tab">
+                        <label class="tab-label  tabbar-bottom middle-line">下载游乐APP</label>
+                    </li>
+                   
+                    <li class="tab" data-role="tab">
+                        <label class="tab-label  tabbar-bottom">在游乐中查看</label>
+                    </li>
+                </ul>
+            </footer>
+        </section>
+    </div>
+
+    <!--- third -->
+    <script src="../assets/third/jquery/jquery-2.1.3.min.js"></script>
+    <script src="../assets/third/jquery/jquery.mobile.custom.min.js"></script>
+    <script src="../assets/third/iscroll/iscroll-probe.js"></script>
+    <!---  agile -->
+    <script type="text/javascript" src="../assets/agile/js/agile.js"></script>
+    <script type="text/javascript" src="../assets/bridge/exmobi.js"></script>
+    <script type="text/javascript" src="../assets/bridge/agile.exmobi.js"></script>
+    <!-- app -->
+    <script type="text/javascript" src="../assets/app/js/app.seedsui.js"></script>
+    <script>
+        //初始化刷新评论
+        var refresh = A.Refresh("#page3");
+        //切换评价类型
+        function checkcomment(obj,model) {
+            
+            if ($(obj).attr("ischecked") == "0") {
+                $(".commentli").removeClass("active");
+                $(".commentli").attr("ischecked", "0");
+                $(obj).attr("ischecked", "1");
+                $(obj).addClass("active");
+                alert(model);
+            }
+        }
+        
+        var headimglist = [{ imgURL: "../Image/1@2x.png", content: "" }, { imgURL: "../Image/3@2x.png", content: "" }, { imgURL: "../Image/11@2x.png", content: "" }];
+        console.log("aa:" + headimglist);
+        function bigPic(id,imglist,index) {
+            $('#' + id + ' img').on(A.options.clickEvent, function () {
+                A.Component.pictureShow({
+                    id: 'picture',
+                    index: index, //$("#slide .slide").index($("#slide .slide.active")),
+                    title: '',
+                    //list: headimglist
+                    list: headimglist
+                });
+            });
+        }
+        $(function () {
+            var index = $("#slide .slide").index($("#slide .slide.active"));;
+            bigPic('slide', headimglist, index);
+        });
+		$('#slider_section').on('sectionshow', function(){
+			A.Component.scroll('#tabbarOuter');
+		});
+		$('#slider_article').on('articleload', function(){
+			A.Slider('#slide', {
+				dots : 'center'
+			});
+			A.Slider('#sliderPage', {
+			    dots: 'hide'
+			});
+			A.Slider('#sliderGoodInfo', {
+			    dots: 'hide'
+			});
+
+		    //上拉刷新评价
+			refresh.on('pullup', function () {
+			    //setTimeout是模拟异步效果，实际场景请勿使用
+			    setTimeout(function () {
+			        $('#commentlist').append('<ul class="comment-list"><li class="noborder"><span style="float:left">某某某</span><span class="spanstar"><img class="graystar" src="../Image/icon/star-gray.png" /><div style="width:60px" class="yellowstar"><img src="../Image/icon/star-yellow.png" /></div></span><span style="float:right" class="font-size13">2016-12-13</span></li><li style="clear:both;" class="font-size13">容评论内容评论内容评论内容 </li></ul>');
+			        refresh.refresh();//当scroll区域有dom结构变化需刷新
+			    }, 1000);
+			});
+		});
+		
+		
+    </script>
+</body>
+</html>

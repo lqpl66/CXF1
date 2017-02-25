@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- DATE_FORMAT -->
+<!-- 时间转字符串：date_format -->
+<!-- 字符串转时间：str_to_date -->
+<!-- DATE_FORMAT(tcb.check_begin_date, '%Y-%m-%d') -->
+<!-- birthday格式：%Y-%m-%d -->
+<!-- 其他时间格式：- %Y-%m-%d %H:%i:%s -->
+<mapper namespace="com.yl.mapper.ScenicMapper">
+	<select id="getscenic" resultType="com.yl.beans.Scenic"
+		parameterType="Map">
+		select s.id,
+		s.scenicName,
+		p.provinceName,
+		c.cityName,
+		s.address,
+		s.planPic,
+		s.openTime,
+		s.coverImg,
+		s.fileCode,
+		s.intro,
+		s.averageScore,
+		s.price,
+		s.evaluateCount,
+		s.collectCount,
+		sp.placeX,
+		sp.placeY,
+		s.serviceTel,
+		s.recommendImg
+		from
+		scenic s
+		left join city c on s.cityId =
+		c.id
+		left join
+		scenicplace sp on
+		sp.scenicId = s.id
+		left join province p
+		on p.id = s.provinceId
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+<!-- 			<if test="cityName != null and cityName!='' "> -->
+<!-- 				c.cityName like "%"#{cityName}"%" -->
+<!-- 			</if> -->
+			<if test="scenicId != null and scenicId != '' ">
+				 s.id = #{scenicId}
+			</if>
+			<if test="isRecommend!= null and isRecommend!=''">
+				OR s.isRecommend = #{isRecommend}
+			</if>
+			AND s.isDel = 0
+			group by s.id
+		</trim>
+	</select>
+
+	<select id="getscenicList" resultType="com.yl.beans.ScenicRcmd"
+		parameterType="Map">
+       select s.id,
+		s.scenicName,
+		p.provinceName,
+		c.cityName,
+		s.address,
+		s.planPic,
+		s.openTime,
+		s.coverImg,
+		s.intro,
+		s.averageScore,
+		s.price,
+		s.evaluateCount,
+		s.collectCount,
+		sp.placeX,
+		sp.placeY,
+		s.serviceTel,
+		s.fileCode,
+		s.recommendImg
+		from
+		scenic s
+		left join city c on s.cityId =
+		c.id
+		left join
+		scenicplace sp on
+		sp.scenicId = s.id
+		left join province p
+		on p.id = s.provinceId
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="cityName != null and cityName!=''">
+				c.cityName like "%"#{cityName}"%"
+			</if>
+			<if test="scenicName != null and scenicName !=''">
+				AND s.scenicName like "%"#{scenicName}"%"
+			</if>
+			<if test="scenicId != null and scenic!= ''">
+				AND s.id = #{scenicId}
+			</if>
+			<if test="isRecommend!= null and isRecommend!=''">
+				OR s.isRecommend = #{isRecommend}
+			</if>
+			AND s.isDel = 0
+			order by 
+<!-- 			 <if test="cityName != null and cityName!=''">c.cityName like "%"#{cityName}"%"  desc,</if> -->
+			  s.isRecommend desc,s.sort desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 10
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+
+
+	<select id="getscenicMenuList" resultType="com.yl.beans.ScenicMenu"
+		parameterType="Map">
+		select sm.id as menuId,
+		sm.scenicId,
+		m.name as menuName,
+		m.sort as
+		menuSort,
+		m.model as menuModel
+		from scenicmenu sm left join menu m on
+		sm.menuId =
+		m.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="scenicId != null and scenicId!=''">
+				sm.scenicId = #{scenicId}
+			</if>
+			AND m.menuType = 1
+		</trim>
+		order by m.sort asc
+	</select>
+
+
+	<select id="getscenicRcmdList" resultType="com.yl.beans.ScenicRecommend"
+		parameterType="Map">
+		select
+		r.name as recommendName,
+		r.sort as recommendSort,
+		r.model as
+		recommendModel,
+		sr.scenicId,
+		sr.recommendId
+		from scenicrecommend sr
+		left
+		join recommend r on r.id =
+		sr.recommendId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="scenicId != null and scenicId!=''">
+				AND sr.scenicId = #{scenicId}
+			</if>
+		</trim>
+		order by r.sort asc
+	</select>
+
+	<select id="getscenicCollectList" resultType="com.yl.beans.ScenicCollect"
+		parameterType="Map">
+		select s.id as scenicId,
+		s.scenicName,
+		p.provinceName,
+		c.cityName,
+		s.coverImg,
+		s.fileCode,
+		s.intro,
+		s.price
+		from
+		scenic s
+		left join
+		city c on
+		s.cityId =
+		c.id
+		left join
+		province p
+		on p.id = s.provinceId
+		left
+		join
+		collect co on
+		s.id = co.fk
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null and userId!='' ">
+				co.userId = #{userId}
+			</if>
+			<if test="model != null and model!='' ">
+				AND co.model = #{model}
+			</if>
+			AND s.isDel = 0
+			order by co.addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+
+	<select id="getattractsInfoList" resultType="com.yl.beans.AttractsInfo"
+		parameterType="Map">
+		select
+		a.id,
+		a.fileCode,
+		s.fileCode as scenicFileCode,
+		a.scenicId,
+		a.attractionsName
+		from attracts a
+		left join scenic s on s.id =
+		a.scenicId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			a.isDel = 0
+			<if test="id!=null and id!=''">
+				AND a.id=#{id}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getattractIntorductionList" resultType="com.yl.beans.AttractsIntorduction"
+		parameterType="Map">
+		select
+		id,
+		attractsId,
+		content,
+		sort
+		from
+		attractsintorduction
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="attractsId!=null and attractsId!=''">
+				attractsId =#{attractsId}
+			</if>
+			AND isDel = 0
+			order by sort asc
+		</trim>
+	</select>
+
+	<select id="getattractImgList" resultType="com.yl.beans.AttractsImg"
+		parameterType="Map">
+		select
+		id,
+		attractsId,
+		imgUrl
+		from
+		attractsimg
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="attractsId!=null and attractsId!=''">
+				attractsId =#{attractsId}
+			</if>
+			AND isDel = 0
+		</trim>
+	</select>
+
+
+	<select id="getscenicImgList" resultType="com.yl.beans.ScenicImg"
+		parameterType="Map">
+		select
+		id,
+		scenicId,
+		imgUrl
+		from
+		scenicimg
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="scenicId!=null and scenicId!=null">
+				scenicId = #{scenicId}
+			</if>
+			AND isDel = 0
+		</trim>
+	</select>
+
+	<select id="getevaluateList" resultType="com.yl.beans.Evaluate"
+		parameterType="Map">
+		select
+		ev.id,
+		ev.fk,
+		ev.score,
+		ev.content,
+		ev.model,
+		ev.userId,
+		ev.orderNo,
+		ev.goodsStandardId,
+		ev.goodsOrderExpandId,
+		date_format(ev.addTime,'%Y-%m-%d') as addTime ,
+		em.nickName,
+		em.headImg
+		from
+		evaluate ev
+		left join
+		employee em on em.id
+		=
+		ev.userId
+		<trim prefix="where" prefixOverrides="AND">
+			ev.fk = #{fk}
+			AND ev.isDel =0
+			<if test="model!=null and model!=''">
+				AND model = #{model}
+			</if>
+			<if test="orderNo !=null and orderNo !=''">
+				AND orderNo = #{orderNo}
+			</if>
+			<if test="userId !=null ">
+				AND userId = #{userId}
+			</if>
+			<if test="goodsStandardId !=null ">
+				AND goodsStandardId = #{goodsStandardId}
+			</if>
+				<if test="goodsOrderExpandId !=null ">
+				AND goodsOrderExpandId = #{goodsOrderExpandId}
+			</if>
+			<if test="type != null and type != ''">
+				<choose>
+					<when test="type == 'l'.toString() ">
+						AND ev.score &gt;=4 AND ev.score &lt;=5
+					</when>
+					<when test="type == 'm'.toString() ">
+						AND ev.score &gt;=2 AND ev.score &lt;4
+					</when>
+					<otherwise>
+						AND ev.score &lt;2
+					</otherwise>
+				</choose>
+			</if>
+			order by ev.id desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<!-- <otherwise> -->
+				<!-- limit 0, 4 -->
+				<!-- </otherwise> -->
+			</choose>
+		</trim>
+	</select>
+	<select id="getevaluateListCount" resultType="String"
+		parameterType="Map">
+		select
+		ifnull(CAST(COUNT(*) AS CHAR),0) as totalNum
+		from
+		evaluate ev
+		left
+		join
+		employee em on em.id
+		=ev.userId
+		<trim prefix="where" prefixOverrides="AND">
+			ev.fk = #{fk}
+			AND ev.isDel =0
+			<if test="model!=null and model!=''">
+				AND model = #{model}
+			</if>
+			<if test="type != null and type != ''">
+				<choose>
+					<when test="type == 'l'.toString() ">
+						AND ev.score &gt;=4 AND ev.score &lt;=5
+					</when>
+					<when test="type == 'm'.toString() ">
+						AND ev.score &gt;=2 AND ev.score &lt;4
+					</when>
+					<otherwise>
+						AND ev.score &lt;2
+					</otherwise>
+				</choose>
+			</if>
+			order by ev.id desc
+		</trim>
+	</select>
+
+
+	<select id="getevaluateImgList" resultType="com.yl.beans.EvaluateImg"
+		parameterType="Map">
+		select
+		id,
+		evaluateId,
+		imgUrl
+		from
+		evaluateimg
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="evaluateId!=null">
+				evaluateId = #{evaluateId}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getrcmdPath" resultType="com.yl.beans.RcmdPath"
+		parameterType="Map">
+		select id ,
+		scenicId,
+		attractionsId,
+		attractionsName,
+		attractionsUrl
+		from
+		recommendpath
+		<trim prefix="WHERE" prefixOverrides="AND">
+			isDel = 0
+			<if test="scenicId!=null">
+				and scenicId = #{scenicId}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getattractRcmdPathList" resultType="com.yl.beans.AttractsRcmdPath">
+		select
+		id,
+		scenicId,
+		attractionsName,
+		marginTop,
+		marginLeft
+		from attracts
+		<trim prefix="WHERE" prefixOverrides="AND">
+			id in
+			<foreach collection="list" item="item" index="index" open="("
+				separator="," close=")">#{item}</foreach>
+			and isDel = 0
+		</trim>
+	</select>
+
+
+	<select id="getattractPathGuideList" resultType="com.yl.beans.AttractsPathGuide"
+		parameterType="Map">
+		select
+		id,
+		scenicId,
+		attractionsName,
+		fileCode,
+		marginTop,
+		marginLeft,
+		fileFormat,
+		fileUrl
+		from attracts
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="scenicId!=null">
+				scenicId=#{scenicId}
+			</if>
+			and isDel = 0
+		</trim>
+	</select>
+
+	<select id="getattractRcmdList" resultType="com.yl.beans.AttractsRcmd"
+		parameterType="Map">
+		select a.id,
+		a.scenicId,
+		a.attractionsName,
+		a.fileCode,
+		ats.imgUrl as
+		attractsImgUrl
+		from attracts a
+		left join attractsimg ats on
+		ats.attractsId = a.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			a.isDel = 0
+			and a.isRecommend = 1
+			<if test="scenicId!=null">
+				and a.scenicId = #{scenicId}
+			</if>
+			and ats.isDel = 0
+			group by a.id
+		</trim>
+	</select>
+
+
+	<select id="getattractsList" resultType="com.yl.beans.Attracts"
+		parameterType="Map">
+		select a.id,
+		a.scenicId,
+		s.fileCode as scenicFileCode,
+		a.fileCode,
+		a.attractionsName,
+		ats.imgUrl as attractsImgUrl,
+		a.price,
+		fileUrl,
+		fileFormat
+		from attracts a
+		left join attractsimg ats on
+		ats.attractsId =
+		a.id
+		left join scenic s on s.id = a.scenicId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			a.isDel = 0
+			<if test="scenicId!=null">
+				AND a.scenicId = #{scenicId}
+			</if>
+			AND ats.isDel = 0
+			group by a.id
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 4
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<select id="gettravelNotesRcmdList" resultType="com.yl.beans.TravelNotesRcmd"
+		parameterType="Map">
+		select
+		id,
+		title,
+		coverImg,
+		fileCode,
+		userId,
+		DATE_FORMAT(addTime, '%Y-%m-%d') as
+		addTime
+		from travelnotes
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="openLevel!=null">
+				openLevel = #{openLevel}
+			</if>
+			<if test="isRecommend!=null">
+				AND isRecommend =#{isRecommend}
+			</if>
+			<if test="isUnderway!=null">
+				AND isUnderway = #{isUnderway}
+			</if>
+			<if test="state!=null">
+				AND state = #{state}
+			</if>
+			order by addTime desc
+		</trim>
+	</select>
+
+	<select id="gettravelNotesList" resultType="com.yl.beans.TravelNotes"
+		parameterType="Map">
+		select
+		tn.id,
+		tn.userId,
+		tn.title,
+		e.uuID,
+		tn.coverImg,
+		tn.browseCount,
+		tn.isUnderway,
+		tn.fileCode,
+		tn.openLevel,
+		tn.state,
+		DATE_FORMAT(tn.addTime, '%Y.%m.%d')
+		as addTime,
+		e.nickName,
+		e.leavel,
+		e.headImg,
+		c.cityName,
+		p.provinceName,
+		tni.describeInfo
+		from travelnotes
+		tn
+		left join (select * from
+		travelnotesinfo t ORDER BY t.addTime asc)
+		tni on
+		tn.id = tni.travelId
+		left join city c
+		on tn.cityId = c.id
+		left join
+		province p on
+		tn.provinceId = p.id
+		left
+		join employee e on
+		e.id
+		=
+		tn.userId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="openLevel!=null">
+				tn.openLevel =#{openLevel}
+			</if>
+			<if test="isUnderway!=null">
+				AND tn.isUnderway = #{isUnderway}
+			</if>
+			<if test="state!=null">
+				AND tn.state = #{state}
+			</if>
+			<if test="title !=null">
+				AND tn.title like "%"#{title}"%"
+			</if>
+			<if test="travelId!=null">
+				AND tn.id = #{travelId}
+			</if>
+			<if test="userId!=null">
+				AND tn.userId = #{userId}
+			</if>
+			group by tn.id
+			order by locate(0,isUnderway) desc, tn.addTime desc,
+			tni.addTime asc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 4
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<select id="gettravelNotesInfoList" resultType="com.yl.beans.TravelNotesInfo"
+		parameterType="Map">
+		select tr.id,
+		tr.travelId,
+		tr.imgUrl,
+		tr.describeInfo,
+		tr.praiseNum,
+		tr.placeName,
+		tr.placeX,
+		tr.placeY,
+		DATE_FORMAT(tr.addTime, '%Y-%m-%d %H:%i:%s') as addTime,
+		DATE_FORMAT(tr.crateDate, '%Y-%m-%d') as crateDate,
+		case when pl.noteId
+		is not null then 'y'
+		else 'n' end as isPraise,
+		pl.userId
+		from
+		travelnotesinfo tr
+		left join (SELECT * from praiselog p where p.userId
+		= #{userId}) pl on pl.noteId = tr.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="travelId!=null and travelId !=''">
+				tr.travelId = #{travelId}
+			</if>
+			<!-- <if test="userId !=null and userId !=''"> -->
+			<!-- AND pl.userId = #{userId} -->
+			<!-- </if> -->
+			GROUP BY tr.id
+			order by tr.addTime asc
+		</trim>
+	</select>
+
+	<select id="getcollectList" resultType="com.yl.beans.Collect"
+		parameterType="Map">
+		select id ,
+		userId,
+		fk,
+		model
+		from collect
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+			<if test="fk!=null and fk != ''">
+				AND fk = #{fk}
+			</if>
+			<if test="model!=null">
+				AND model = #{model}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getcollectListCount" resultType="String"
+		parameterType="Map">
+		select
+		ifnull(CAST(COUNT(*) AS CHAR),0) as totalNum
+		from collect
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null">
+				userId = #{userId}
+			</if>
+			<if test="fk!=null and fk != ''">
+				AND fk = #{fk}
+			</if>
+			<if test="model!=null">
+				AND model = #{model}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getscenicCard" parameterType="Map"
+		resultType="com.yl.beans.ScenicCard">
+		select
+		id,
+		scenicId,
+		cardType,
+		cardNo,
+		<!-- checkCode, -->
+		status
+		from
+		sceniccard
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<!-- <if test=" checkCode != null and checkCode != ''"> -->
+			<!-- checkCode = #{checkCode} -->
+			<!-- </if> -->
+			<if test="cardNo !=null">
+				cardNo = #{cardNo}
+			</if>
+			<if test="scenicId !=null">
+				AND scenicId = #{scenicId}
+			</if>
+			<if test="status !=null">
+				AND status = #{status}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getGuideUrl" parameterType="Map" resultType="com.yl.beans.Guide">
+		select a.attractionsName,a.fileUrl,a.scenicId,a.fileCode from
+		ibeaconforguide ifg left join
+		attracts a on a.id=ifg.attractsId
+		left
+		join ibeacondevice ibd on
+		ibd.id=ifg.ibeaconId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="deviceNo !=null">
+				ibd.deviceNo = #{deviceNo}
+			</if>
+			<if test="deviceType !=null">
+				AND ibd.deviceType = #{deviceType}
+			</if>
+			<if test="state !=null">
+				AND ibd.state = #{state}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getVersion" parameterType="Map" resultType="com.yl.beans.Version">
+		select
+		version,
+		forceUpdate,
+		cityVersion,
+		mbSystemType,
+		operateType,
+		apkUrl
+		from version
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="mbSystemType !=null">
+				mbSystemType = #{mbSystemType}
+			</if>
+			<if test="operateType !=null">
+				AND operateType = #{operateType}
+			</if>
+			order by addTime desc
+		</trim>
+		
+	</select>
+
+</mapper>

@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- DATE_FORMAT -->
+<!-- 时间转字符串：date_format -->
+<!-- 字符串转时间：str_to_date -->
+<!-- DATE_FORMAT(tcb.check_begin_date, '%Y-%m-%d') -->
+<!-- birthday格式：%Y-%m-%d -->
+<!-- 其他时间格式：- %Y-%m-%d %H:%i:%s -->
+<!-- str_to_date(#{uuIDExpiry,jdbcType = DATE},'%Y-%m-%d %H:%i:%s') -->
+<mapper namespace="com.yl.mapper.ShopMapper">
+
+	<select id="getshopNearList" parameterType="Map"
+		resultType="com.yl.beans.ShopNear">
+		select
+		id,
+		shopName,
+		placeY,
+		shopNo,
+		placeX,
+		ACOS(
+		SIN((#{placeY,jdbcType=DOUBLE} *
+		3.1415926) / 180 ) * SIN((placeY *
+		3.1415926) / 180 )
+		+COS((#{placeY,jdbcType=DOUBLE} * 3.1415926) / 180 )
+		* COS((placeY *
+		3.1415926) / 180 )
+		*COS((#{placeX,jdbcType=DOUBLE} *
+		3.1415926) / 180 -
+		(placeX * 3.1415926) / 180 ) ) * 6380 distance
+		from
+		shop
+		<where>
+			ACOS(
+			SIN((#{placeY,jdbcType=DOUBLE} * 3.1415926) / 180 ) *
+			SIN((placeY * 3.1415926) / 180 )
+			+COS((#{placeY,jdbcType=DOUBLE} *
+			3.1415926) / 180 ) * COS((placeY*3.1415926) / 180 )
+			*COS((#{placeX,jdbcType=DOUBLE} * 3.1415926) / 180 - (placeX
+			*3.1415926) / 180 ) ) * 6380 &lt; 1
+			and workState != 3
+		</where>
+	</select>
+
+	<select id="getSpecialityList" parameterType="Map"
+		resultType="com.yl.beans.Speciality">
+		select
+		gs.id,
+		gb.imgUrl,
+		gs.goodName,
+		gsd.price,
+		gs.intro,
+		s.fileCode as
+		shopFileCode,
+		gs.fileCode,
+		gsd.id as goodsstandardId,
+		gsd.name as
+		goodsstandardName,
+		gsd.inventory
+		from goods gs
+		left join goodbanner gb on
+		gb.goodId = gs.id
+		left join goodsstandard gsd on gs.id = gsd.goodId
+		left join shop s on s.id = gs.shopId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test=" list !=null">
+				gs.shopId in
+				<foreach collection="list" item="item" index="index" open="("
+					close=")" separator=",">
+					<if test="item !=null">
+						#{item}
+					</if>
+				</foreach>
+			</if>
+			<if test="isRecommend !=null">
+				AND gs.isRecommend = #{isRecommend}
+			</if>
+				<if test="isSelfRecommend !=null">
+				AND gs.isSelfRecommend = #{isSelfRecommend}
+			</if>
+			<if test="goodName !=null">
+				AND gs.goodName like "%"#{goodName}"%"
+			</if>
+			AND gs.isSell = 0
+			AND s.workState != 3
+			group by
+			gs.id asc
+			<if test="type !=null and type != '' ">
+				<choose>
+					<when test="type == '2'.toString() ">
+						ORDER BY gsd.price desc
+					</when>
+					<when test="type == '3'.toString() ">
+						ORDER BY gsd.price asc
+					</when>
+					<when test="type == '4'.toString() ">
+						ORDER BY gsd.sellNumber desc
+					</when>
+					<when test="type == '5'.toString() ">
+						order by locate(1,gs.isRecommend) desc, gs.addTime
+						desc
+					</when>
+					<when test="type == '6'.toString() ">
+						order by gs.isSelfRecommend desc,gs.sort desc, gs.addTime
+						desc
+					</when>
+				</choose>
+			</if>
+			<choose>
+				<when test="start != null  and  num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<select id="getSpecialityDetails" parameterType="Map"
+		resultType="com.yl.beans.SpecialityDetails">
+		select
+		gs.id,
+		gs.goodName,
+		gs.intro,
+		gs.goodType,
+		gs.fileCode,
+		gs.shopId,
+		gs.freightId,
+		gs.returnTime,
+		s.fileCode
+		as
+		shopFileCode,
+		gs.isSelf,
+		s.workState,
+		s.shopName,
+		s.logo
+		from goods gs
+		left
+		join shop s on s.id =
+		gs.shopId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="isRecommend !=null">
+				gs.isRecommend = #{isRecommend}
+			</if>
+			<if test="id !=null ">
+				AND gs.id = #{id}
+			</if>
+			AND gs.isSell = 0
+			AND s.workState != 3
+		</trim>
+	</select>
+
+	<select id="getSpecialityBannerList" parameterType="Map"
+		resultType="com.yl.beans.SpecialityBanner">
+		select
+		id,
+		imgUrl,
+		goodId
+		from goodbanner
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId != null">
+				goodId = #{goodId}
+			</if>
+			order by addTime asc
+		</trim>
+	</select>
+
+	<select id="getSpecialityInfoList" parameterType="Map"
+		resultType="com.yl.beans.SpecialityInfo">
+		select
+		id,
+		imgUrl,
+		goodId
+		from goodinfo
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId != null">
+				goodId = #{goodId}
+			</if>
+			order by sort asc
+		</trim>
+	</select>
+
+	<select id="getSpecialityStandardList" parameterType="Map"
+		resultType="com.yl.beans.SpecialityStandard">
+		select
+		id,
+		goodId,
+		name,
+		standardNo,
+		marketPrice,
+		price,
+		inventory,
+		sellNumber,
+		warningNumber
+		from goodsstandard
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId != null">
+				goodId = #{goodId}
+			</if>
+				<if test="goodsStandardId != null">
+				AND id = #{goodsStandardId}
+			</if>
+			AND isDel = 0
+			order by id asc
+		</trim>
+	</select>
+
+	<select id="getspecialityCount" resultType="String"
+		parameterType="Map">
+		select
+		ifnull(CAST(COUNT(*) AS CHAR),0) as totalNum
+		from goods
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="shopId">
+				shopId = #{shopId}
+			</if>
+			AND isSell =0
+		</trim>
+	</select>
+
+
+	<select id="getspcialityAttributes" parameterType="Map"
+		resultType="com.yl.beans.SpecialityAttributes">
+		SELECT a.name as attributeName,
+		ga.attrValue as attributeValue
+		from
+		goodstype gst
+		LEFT JOIN
+		attributes a on a.goodsTypeId = gst.id
+		LEFT JOIN
+		goods gs on
+		gs.goodType = gst.id
+		LEFT JOIN goodattributes ga on
+		ga.goodId = gs.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id !=null">
+				gs.id = #{id}
+			</if>
+			AND gs.isSell =0
+		</trim>
+		and ga.attributesId = a.id
+	</select>
+
+	<select id="getshopInfo" parameterType="Map" resultType="com.yl.beans.Shop">
+		select
+		s.id,
+		s.shopNo,
+		s.shopName,
+		s.workState,
+		s.provinceId,
+		s.cityId,
+		p.provinceName,
+		c.cityName,
+		s.address,
+		s.linkManName,
+		s.linkManMobile,
+		DATE_FORMAT(s.addTime, '%Y-%m-%d') as openTime,
+		s.intro,
+		s.fileCode,
+		s.logo
+		from shop s
+		left join city c on c.id= s.cityId
+		left join province
+		p on p.id
+		= s.provinceId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id !=null">
+				s.id = #{id}
+			</if>
+			<choose>
+				<when test="type==1">
+					AND s.workState!=3
+				</when>
+			</choose>
+
+		</trim>
+	</select>
+
+	<select id="getPostagetemplate" parameterType="Map"
+		resultType="com.yl.beans.Postagetemplate">
+		select
+		id,
+		shopId,
+		defaultPrice,
+		maxPrice
+		from postagetemplate
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id !=null">
+				id = #{id}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getPostageappend" parameterType="Map"
+		resultType="com.yl.beans.Postageappend">
+		select
+		pa.id as postageappendId,
+		pa.shopId,
+		pa.defaultPrice,
+		pa.maxPrice,
+		pap.provinceId,
+		pa.postageId
+		from
+		postageappend pa
+		left join
+		postageappendprovince pap
+		on
+		pap.postageAppendId = pa.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="postageappendId !=null">
+				pa.id = #{postageappendId}
+			</if>
+			<if test="provinceId !=null">
+				AND pap.provinceId = #{provinceId}
+			</if>
+			<if test="postageId !=null">
+				AND pa.postageId = #{postageId}
+			</if>
+		</trim>
+	</select>
+
+	<select id="getshopCollectList" resultType="com.yl.beans.Shop"
+		parameterType="Map">
+		select
+		s.id,
+		s.shopNo,
+		s.shopName,
+		s.workState,
+		s.provinceId,
+		s.cityId,
+		p.provinceName,
+		c.cityName,
+		s.address,
+		s.linkManName,
+		s.linkManMobile,
+		DATE_FORMAT(s.addTime, '%Y-%m-%d') as openTime,
+		s.intro,
+		s.fileCode,
+		s.logo
+		from shop s
+		left join city c on c.id= s.cityId
+		left join province
+		p on p.id
+		= s.provinceId
+		left join
+		collect co on
+		s.id = co.fk
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null and userId!='' ">
+				co.userId = #{userId}
+			</if>
+			<if test="model != null and model!='' ">
+				AND co.model = #{model}
+			</if>
+			AND s.workState != 3
+			order by co.addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<delete id="deleteCar" parameterType="Map">
+		DELETE FROM shoppingcar
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId != null ">
+				goodId = #{goodId}
+			</if>
+			<if test="goodsStandardId != null ">
+				AND goodsStandardId = #{goodsStandardId}
+			</if>
+			<if test="userId != null ">
+				AND userId = #{userId}
+			</if>
+		</trim>
+	</delete>
+
+	<select id="getShoppingCar" resultType="com.yl.beans.ShoppingCar"
+		parameterType="Map">
+		select
+		userId,
+		goodId,
+		goodsStandardId,
+		goodNumber,
+		shopId
+		from shoppingcar
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				userId = #{userId}
+			</if>
+			<if test="goodId != null ">
+				AND goodId= #{goodId}
+			</if>
+			<if test="goodsStandardId != null  ">
+				AND goodsStandardId = #{goodsStandardId}
+			</if>
+		</trim>
+	</select>
+
+
+	<update id="updateShoppingCar" parameterType="Map">
+		update shoppingcar
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="goodNumber !=null and goodNumber ">
+				goodNumber = #{goodNumber},
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId != null ">
+				userId = #{userId}
+			</if>
+			<if test="goodId != null ">
+				AND goodId= #{goodId}
+			</if>
+			<if test="goodsStandardId != null  ">
+				AND goodsStandardId = #{goodsStandardId}
+			</if>
+		</trim>
+	</update>
+
+	<insert id="saveShoppingCar" parameterType="Map">
+		insert ignore into
+		shoppingcar(
+		userId,
+		goodId,
+		goodsStandardId,
+		goodNumber,
+		shopId,
+		addTime
+		)
+		values(
+		#{userId,jdbcType =
+		INTEGER},
+		#{goodId,jdbcType =
+		INTEGER},
+		#{goodsStandardId,jdbcType =
+		INTEGER},
+		#{goodNumber,jdbcType =
+		INTEGER},
+		#{shopId,jdbcType =
+		INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+
+
+	<select id="getShoppingCarList" resultType="String"
+		parameterType="Map">
+		select
+		concat(concat('[',shoplist),']') as asss
+		from
+		(
+		select group_concat(aa) as shoplist from
+		(
+		select
+		CONCAT('{"shopId":',shopId,
+		',"shopName":"',shopName,'","workState":',workState,',"specialityList":',specialityList,'}')
+		as
+		aa from
+		(
+		select
+		shopId,shopName,workState,concat('[',group_concat(speciality),']') as
+		specialityList from
+		(
+		select sc.shopId,sp.shopName,sp.workState,
+		concat(
+		'{"goodId":',
+		sc.goodId,
+		',"goodsStandardId":',
+		sc.goodsStandardId,
+		',"shopId":',
+		sc.shopId,
+		',"shopfileCode":"',
+		sp.fileCode,
+		'","fileCode":"',
+		gs.fileCode,
+		'","goodNumber":',
+		sc.goodNumber,
+		',"goodName":"',
+		gs.goodName,
+		'","imgUrl":"',
+		'","isSell":',
+		gs.isSell,
+		',"intro":"',
+		gs.intro,
+		'","isSelf":',
+		gs.isSelf,
+		',"price":',
+		gsd.price,
+		',"goodsStandardName":"',
+		gsd.`name`,
+		'","inventory":',
+		gsd.inventory,
+		 ',"isDel":',
+        gsd.isDel,
+		'}') as
+		speciality
+		from shoppingcar sc
+		LEFT JOIN goods gs
+		on gs.id =
+		sc.goodId
+		LEFT JOIN goodsstandard gsd on
+		gsd.id =
+		sc.goodsStandardId
+		LEFT
+		JOIN shop sp on sp.id = sc.shopId
+		where
+		userId =
+		#{userId}
+		) as A
+		group by
+		shopId
+		) as AA
+		) as AAA
+		) as aaaa
+	</select>
+
+
+	<select id="getSpecialityDetailsForOrder" parameterType="Map"
+		resultType="com.yl.beans.Goods">
+		select
+		gs.id as goodId,
+		gs.goodName,
+		gs.intro,
+		gs.goodType,
+		gs.fileCode,
+		gs.shopId,
+		gs.freightId,
+		gs.returnTime,
+		s.fileCode
+		as
+		shopfileCode,
+		gs.isSelf,
+		gs.isSell,
+		s.workState,
+		s.shopName,
+		gsd.price,
+		gsd.id as
+		goodsStandardId,
+		gsd.inventory,
+		gsd.name as goodsStandardName
+		from goods gs
+		left
+		join shop s
+		on s.id =
+		gs.shopId
+		left join goodsstandard
+		gsd on gs.id =
+		gsd.goodId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId !=null ">
+				gs.id = #{goodId}
+			</if>
+			<if test="goodsStandardId !=null ">
+				AND gsd.id = #{goodsStandardId}
+			</if>
+			AND gsd.isDel = 0
+		</trim>
+	</select>
+
+	<update id="operateSpecialityStandard" parameterType="Map">
+		UPDATE goodsstandard
+		<trim prefix="set" suffixOverrides=",">
+			<choose>
+				<when test="type =='add' ">
+					<if test="goodNumber !=null">
+						inventory=inventory+ #{goodNumber}
+						, sellNumber =
+						sellNumber - #{goodNumber}
+					</if>
+				</when>
+				<otherwise>
+					<if test="goodNumber !=null">
+						inventory=inventory - #{goodNumber}
+						, sellNumber =
+						sellNumber+ #{goodNumber}
+					</if>
+				</otherwise>
+			</choose>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodId !=null ">
+				goodId = #{goodId}
+			</if>
+			<if test="goodsStandardId !=null ">
+				AND id = #{goodsStandardId}
+			</if>
+		</trim>
+	</update>
+
+</mapper>

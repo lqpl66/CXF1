@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- DATE_FORMAT -->
+<!-- 时间转字符串：date_format -->
+<!-- 字符串转时间：str_to_date -->
+<!-- DATE_FORMAT(tcb.check_begin_date, '%Y-%m-%d') -->
+<!-- birthday格式：%Y-%m-%d -->
+<!-- 其他时间格式：- %Y-%m-%d %H:%i:%s -->
+<!-- str_to_date(#{uuIDExpiry,jdbcType = DATE},'%Y-%m-%d %H:%i:%s') -->
+<mapper namespace="com.yl.mapper.TravelNoteMapper">
+
+	<insert id="savetravelNotes" parameterType="com.yl.beans.TravelNotes"
+		useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO
+		travelnotes
+		(userId,title,provinceId,cityId,coverImg,openLevel,browseCount,
+		addTime,isRecommend,isUnderway,state,fileCode)
+		VALUES
+		(
+		#{userId,jdbcType =INTEGER},
+		#{title,jdbcType =VARCHAR},
+		#{provinceId,jdbcType =INTEGER},
+		#{cityId,jdbcType =INTEGER},
+		#{coverImg,jdbcType =VARCHAR},
+		#{openLevel,jdbcType =INTEGER},
+		#{browseCount,jdbcType =INTEGER},
+		str_to_date(#{addTime,jdbcType =
+		DATE},'%Y-%m-%d %H:%i:%s'),
+		#{isRecommend,jdbcType =TINYINT},
+		#{isUnderway,jdbcType =TINYINT},
+		#{state,jdbcType =INTEGER},
+		#{fileCode,jdbcType =VARCHAR}
+		)
+	</insert>
+
+	<update id="updatetravelNotes" parameterType="com.yl.beans.TravelNotes">
+		update travelnotes
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="title!=null and title!='' ">
+				title = #{title},
+			</if>
+			<if test="provinceId !=null ">
+				provinceId = #{provinceId},
+			</if>
+			<if test="cityId!=null and cityId!=''">
+				cityId = #{cityId},
+			</if>
+			<if test="coverImg!=null and coverImg!=''">
+				coverImg = #{coverImg},
+			</if>
+			<if test="openLevel !=null">
+				openLevel = #{openLevel},
+			</if>
+			<if test="browseCount!=null ">
+				browseCount = #{browseCount},
+			</if>
+			<if test="isRecommend!=null ">
+				isRecommend = #{isRecommend},
+			</if>
+			<if test="isUnderway!=null ">
+				isUnderway = #{isUnderway},
+			</if>
+			<if test="state!=null ">
+				state = #{state},
+			</if>
+			<if test="fileCode!=null and fileCode!=''">
+				fileCode = #{fileCode}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id !=null ">
+				id = #{id}
+			</if>
+			<if test="userId!=null ">
+				AND userId = #{userId}
+			</if>
+		</trim>
+	</update>
+
+	<update id="updatebrowseCount" parameterType="Map">
+		update travelnotes
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="title!=null and title!='' ">
+				title = #{title},
+			</if>
+			<if test="provinceId!=null ">
+				provinceId = #{provinceId},
+			</if>
+			<if test="cityId!=null ">
+				cityId = #{cityId},
+			</if>
+			<if test="coverImg!=null and coverImg!=''">
+				coverImg = #{coverImg},
+			</if>
+			<if test="openLevel!=null ">
+				openLevel = #{openLevel},
+			</if>
+			<if test="afterbrowseCount !=null ">
+				browseCount = #{afterbrowseCount},
+			</if>
+			<if test="isRecommend!=null ">
+				isRecommend = #{isRecommend},
+			</if>
+			<if test="isUnderway!=null ">
+				isUnderway = #{isUnderway},
+			</if>
+			<if test="state!=null ">
+				state = #{state},
+			</if>
+			<if test="fileCode!=null and fileCode!=''">
+				fileCode = #{fileCode}
+			</if>
+		</trim>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="id!=null ">
+				id = #{id}
+			</if>
+			<if test="userId!=null ">
+				AND userId = #{userId}
+			</if>
+			<if test="prebrowseCount !=null ">
+				AND browseCount = #{prebrowseCount}
+			</if>
+		</trim>
+	</update>
+
+
+	<insert id="savetravelNotesInfoList" parameterType="java.util.List">
+		INSERT INTO travelnotesinfo
+		(travelId,praiseNum,imgUrl,describeInfo,placeName,crateDate,addTime,placeX,placeY)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.travelId,jdbcType=INTEGER},
+			#{item.praiseNum,jdbcType=INTEGER},
+			#{item.imgUrl,jdbcType=VARCHAR},
+			#{item.describeInfo,jdbcType=VARCHAR},
+			#{item.placeName,jdbcType=VARCHAR},
+			str_to_date(#{item.crateDate,jdbcType=DATE},'%Y-%m-%d'),
+			str_to_date(#{item.addTime,jdbcType=DATE},'%Y-%m-%d %H:%i:%s'),
+			#{item.placeX,jdbcType=DECIMAL},
+			#{item.placeY,jdbcType=DECIMAL}
+			)
+		</foreach>
+	</insert>
+	<delete id="deleteById" parameterType="Map">
+		delete from
+		travelnotesinfo
+		where travelId = #{travelId}
+		AND id = #{id}
+	</delete>
+	<!-- praiseNum,imgUrl,describeInfo,placeName,crateDate,addTime -->
+	<update id="updatetravelNotesInfoList" parameterType="com.yl.beans.TravelNotesInfo">
+			update travelnotesinfo
+			<trim prefix="SET" suffixOverrides=",">
+				<if test="praiseNum!=null ">
+					praiseNum =#{praiseNum,jdbcType=INTEGER},
+				</if>
+				<if test="imgUrl!=null and imgUrl!=''">
+					imgUrl = #{imgUrl,jdbcType=VARCHAR},
+				</if>
+				<if test="describeInfo!=null and describeInfo!=''">
+					describeInfo =#{describeInfo,jdbcType=VARCHAR},
+				</if>
+					<if test="placeY !=null ">
+					placeY =#{placeY,jdbcType=DECIMAL},
+				</if>
+					<if test="placeX !=null ">
+					placeX =#{placeX,jdbcType=DECIMAL},
+				</if>
+				<if test="placeName!=null and placeName!=''">
+					placeName = #{placeName,jdbcType=VARCHAR},
+				</if>
+				<if test="crateDate!=null and crateDate!=''">
+					crateDate =
+					DATE_FORMAT(#{crateDate,jdbcType=DATE},'%Y-%m-%d'),
+				</if>
+				<if test="addTime!=null and addTime!=''">
+					addTime =
+					DATE_FORMAT(
+					#{addTime,jdbcType=DATE},
+					'%Y-%m-%d
+					%H:%i:%s'),
+				</if>
+			</trim>
+			<trim prefix="where" prefixOverrides="and">
+				<if test="id!=null ">
+					id =#{id}
+				</if>
+				<if test="travelId!=null  and travelId>0">
+					and travelId= #{travelId}
+				</if>
+			</trim>
+	</update>
+
+	<select id="getProvince" resultType="com.yl.beans.Province">
+		select id as provinceId
+		,provinceName from province
+	</select>
+
+	<select id="getCity" resultType="com.yl.beans.City"
+		parameterType="Map">
+		select
+		p.provinceName,
+		c.id as cityId,
+		c.cityName,
+		c.provinceId
+		from city c
+		left join province p on c.provinceId = p.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="cityId!=null ">
+				c.id = #{cityId}
+			</if>
+			<if test="provinceId!=null ">
+				AND c.provinceId = #{provinceId}
+			</if>
+		</trim>
+	</select>
+
+	<select id="gettravelNoteCollcet" resultType="com.yl.beans.TravelNotes"
+		parameterType="Map">
+		select
+		tn.id,
+		tn.userId,
+		tn.title,
+		e.uuID,
+		tn.coverImg,
+		tn.browseCount,
+		tn.isUnderway,
+		tn.fileCode,
+		tn.state,
+		DATE_FORMAT(tn.addTime, '%Y-%m-%d')
+		as addTime,
+		e.nickName,
+		e.headImg,
+		e.leavel,
+		c.cityName,
+		p.provinceName
+		from travelnotes tn
+		left join city c
+		on tn.cityId = c.id
+		left join
+		province p on tn.provinceId = p.id
+		left
+		join employee e on
+		e.id
+		=tn.userId 
+		left join collect co on co.fk = tn.id
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="userId!=null ">
+				co.userId = #{userId}
+			</if>
+			<if test="model!=null and model!=''">
+				AND co.model = #{model}
+			</if>
+			AND tn.state =1
+			order by co.addTime desc
+			<choose>
+				<when test="start != null and num!=null">
+					limit #{start}, #{num}
+				</when>
+				<otherwise>
+					limit 0, 6
+				</otherwise>
+			</choose>
+		</trim>
+	</select>
+
+	<select id="gettravelNotes" resultType="com.yl.beans.TravelNotes"
+		parameterType="Map">
+		select
+		tn.id,
+		tn.userId,
+		tn.title,
+		e.uuID,
+		tn.coverImg,
+		tn.browseCount,
+		tn.isUnderway,
+		tn.fileCode,
+		tn.state,
+		DATE_FORMAT(tn.addTime, '%Y-%m-%d')
+		as addTime,
+		e.nickName,
+		e.leavel,
+		e.headImg,
+		c.cityName,
+		tn.userId,
+		tn.provinceId,
+		tn.cityId,
+		tn.openLevel,
+		p.provinceName
+		from travelnotes tn
+		left join city c
+		on tn.cityId = c.id
+		left join
+		province p on tn.provinceId = p.id
+		left
+		join employee e on
+		e.id
+		=tn.userId
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="openLevel!=null ">
+				tn.openLevel =#{openLevel}
+			</if>
+			<if test="isUnderway!=null ">
+				AND tn.isUnderway = #{isUnderway}
+			</if>
+			<if test="state!=null ">
+				AND tn.state = #{state}
+			</if>
+			<if test="userId!=null ">
+				AND tn.userId = #{userId}
+			</if>
+			<if test="id!=null">
+				AND tn.id = #{id}
+			</if>
+			order by tn.addTime desc
+		</trim>
+	</select>
+
+
+	<select id="gettravelNotesInfo" parameterType="Map" resultType="com.yl.beans.TravelNotesInfo">
+		select id,
+		travelId,
+		imgUrl,
+		describeInfo,
+		praiseNum,
+		placeName,
+		placeX,
+		placeY,
+		DATE_FORMAT(addTime, '%Y-%m-%d %H:%i:%s') as addTime,
+		DATE_FORMAT(crateDate, '%Y-%m-%d') as crateDate
+		from travelnotesinfo
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="travelId!=null">
+				travelId = #{travelId}
+			</if>
+			<if test="id!=null ">
+				AND id = #{id}
+			</if>
+			order by addTime asc
+			limit 1
+		</trim>
+	</select>
+
+	<select id="getpraiseCount" parameterType="Map" resultType="Integer">
+		select count(id)
+		from
+		praiselog
+		where
+		noteId = #{noteId}
+	</select>
+
+	<insert id="savepraiseLog" parameterType="Map">
+		INSERT INTO praiselog
+		(userId,noteId,addTime)
+		VALUES
+		(
+		#{userId,jdbcType=INTEGER},
+		#{noteId,jdbcType=INTEGER},
+		str_to_date(#{addTime,jdbcType=DATE},'%Y-%m-%d %H:%i:%s')
+		)
+	</insert>
+
+	<delete id="deletepraiseById" parameterType="Map">
+		delete from
+		praiselog
+		where userId = #{userId}
+		AND noteId = #{noteId}
+	</delete>
+</mapper>
