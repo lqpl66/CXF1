@@ -82,7 +82,7 @@ public class AlipayUtil {
 		// 支付业务请求参数
 		pcont.put("out_trade_no", tradeNo); // 商户订单号
 		pcont.put("total_amount", total_amount);// 交易金额
-		pcont.put("subject", "上海佑途物联网有限公司"); // 订单标题
+		pcont.put("subject", "******"); // 订单标题
 		pcont.put("body", body);// 对交易或商品的描述
 		pcont.put("timeout_express", "30m");
 		pcont.put("product_code", "QUICK_MSECURITY_PAY");
