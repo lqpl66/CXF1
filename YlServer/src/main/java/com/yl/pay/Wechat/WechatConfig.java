@@ -9,17 +9,17 @@ public class WechatConfig {
 	   /**
 	    * 商户APPID
 	    */
-	   public static final String  AppId = "wxbdcfe1827f998833";
+	   public static final String  AppId = "*****";
 
 	   /**
 	    * 商户账户 
 	    */
-	   public static final String  MchId = "1393632002";
+	   public static final String  MchId = "*****";
 
 	   /**
 	    * 商户秘钥  32位，在微信商户平台中设置
 	    */
-	   public static final String  AppSercret = "Z0ivPhjvCydn2sW9VjIosGaSbQ7Zkvl2";
+	   public static final String  AppSercret = "*****";
 	   /**
 	    * 查询订单地址
 	    */
@@ -73,7 +73,7 @@ public class WechatConfig {
 	   /**
 	    * 商品描述
 	    */
-//	   public static String body = "佑途特产";
+//	   public static String body = "****";
 //
 //	   private static  Properties properties;
 //
